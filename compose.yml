@@ -1,18 +1,30 @@
 services:
   wordpress:
-    image: wordpress:6.8.1-php8.2-apache
+    build:
+      context: docker/php
     container_name: wordpress-${WORDPRESS_DB_NAME}
-    ports:
-      - "${WORDPRESS_PORT}:80"
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
       WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      XDEBUG_MODE: develop,debug
     volumes:
       - ./:/var/www/html
     depends_on:
       - db
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nginx-${WORDPRESS_DB_NAME}
+    ports:
+      - "${WORDPRESS_PORT}:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - wordpress
+      - phpmyadmin
 
   db:
     image: mariadb:11.3
