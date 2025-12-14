@@ -1,4 +1,4 @@
-FROM wordpress:6.8.1-php8.2-fpm
+FROM wordpress:6.9.0-php8.2-fpm
 
 RUN set -eux; \
     apt-get update; \
